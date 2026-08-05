@@ -1,0 +1,24 @@
+generated: '2026-08-05'
+method: probed
+probe: true
+url: https://trust.demandscience.com/
+alternate_url: https://demandscience.com/trust-center/
+platform: Vanta Trust Report
+certifications: []
+certifications_note: >-
+  A real trust center exists and returns HTTP 200, but it is a client-side-rendered
+  Vanta trust report (assets.vanta.com/static/index-trust-report.*.js) — the served
+  HTML is a 4.6 KB shell containing no certification names, and the Vanta trust-page
+  API returns 401 to an anonymous caller. No SOC 2 / ISO 27001 / PCI DSS / HIPAA /
+  FedRAMP claim could be verified without executing the page's JavaScript, so
+  certifications[] is deliberately left empty rather than asserted. No `Compliance`
+  pointer is wired in apis.yml for the same reason.
+evidence:
+- {source: 'https://trust.demandscience.com/', http_status: 200, content_type: 'text/html', bytes: 4664, platform_markers: [assets.vanta.com/static/index-trust-report, app.vanta.com/doc]}
+- {source: 'https://demandscience.com/trust-center/', http_status: 200, note: 'corporate Trust Center page; nav links to the Vanta trust report'}
+- {source: 'https://api.vanta.com/v1/trust-pages/demandscience', http_status: 401, note: 'Vanta API refuses anonymous reads'}
+x-evidence:
+  fetched: '2026-08-05'
+  url: https://trust.demandscience.com/
+  http_status: 200
+  content_type: text/html

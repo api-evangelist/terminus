@@ -1,0 +1,55 @@
+generated: '2026-08-05'
+method: probed
+source: live GET of /.well-known/* across every Terminus + DemandScience host
+summary: >-
+  No .well-known document was recovered on any host. api.terminusplatform.com answers
+  every path — including every /.well-known/* path — with HTTP 401 "Authentication
+  Invalid", so the discovery surface is behind the same gate as the API itself.
+  email.terminusplatform.com and app.demandscienceplatform.com are single-page apps
+  whose catch-all route returns HTTP 200 with an HTML shell for every path; those 200s
+  are NOT documents and are recorded here as html-catchall so a later run does not
+  mistake them for hits. No agent card, no OAuth/OIDC metadata, no security.txt,
+  no api-catalog, no llms.txt.
+hosts:
+- host: https://api.terminusplatform.com
+  note: live API host; blanket 401 on every path
+  documents:
+  - {path: /.well-known/security.txt, status: 401}
+  - {path: /.well-known/openid-configuration, status: 401}
+  - {path: /.well-known/oauth-authorization-server, status: 401}
+  - {path: /.well-known/api-catalog, status: 401}
+  - {path: /.well-known/agent-card.json, status: 401}
+  - {path: /.well-known/agent.json, status: 401}
+- host: https://developer.terminus.com
+  note: Redocly developer portal; every path 302s to /redocly-login
+  documents:
+  - {path: /.well-known/agent-card.json, status: 302, redirect: /redocly-login}
+  - {path: /.well-known/agent.json, status: 302, redirect: /redocly-login}
+  - {path: /llms.txt, status: 302, redirect: /redocly-login}
+- host: https://email.terminusplatform.com
+  note: Email Experiences (Signature Ads) SPA; catch-all returns HTML for every path
+  documents:
+  - {path: /.well-known/security.txt, status: 200, result: html-catchall}
+  - {path: /.well-known/openid-configuration, status: 200, result: html-catchall}
+  - {path: /.well-known/agent-card.json, status: 200, result: html-catchall}
+  - {path: /.well-known/agent.json, status: 200, result: html-catchall}
+- host: https://terminus.bound360.com
+  note: Web Experiences host
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://app.demandscienceplatform.com
+  note: DemandScience ABM Platform SPA; S3/CloudFront origin returns 403 on unrouted paths
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/agent-card.json, status: 403}
+  - {path: /.well-known/agent.json, status: 403}
+  - {path: /.well-known/openid-configuration, status: 200, result: html-catchall}
+- host: https://demandscience.com
+  note: corporate site (terminus.com 301s here)
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /llms.txt, status: 404}

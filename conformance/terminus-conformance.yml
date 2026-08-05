@@ -1,0 +1,67 @@
+generated: '2026-08-05'
+method: searched
+source: https://support.demandscience.com/hc/en-us
+note: >-
+  Terminus publishes no OpenAPI, AsyncAPI, GraphQL SDL or JSON Schema anywhere that
+  is anonymously reachable, so nothing below is derived from a specification. Every
+  entry is either a claim made in the public DemandScience Help Center or a fact
+  observed by probing the live hosts. Standards that cannot be checked without
+  credentials are recorded as conforms: unknown rather than false.
+standards:
+- id: saml2
+  conforms: true
+  evidence: >-
+    "DemandScience supports the SAML 2.0 authentication framework for additional 3rd
+    party SSO providers... both SP-initiated and Identity Provider (IdP) initiated
+    SAML integrations."
+  source: https://support.demandscience.com/hc/en-us/articles/360059215833-Logging-Into-the-DemandScience-Platform-Using-SAML-2-0
+- id: oidc
+  conforms: true
+  evidence: >-
+    Same article offers OpenID Connect as an alternative to SAML, requiring the
+    customer's issuer, OAuth 2.0 authorization endpoint, token endpoint, JWKS
+    endpoint and userinfo endpoint. This is OIDC as a relying party for user SSO —
+    not an OIDC-protected API. No /.well-known/openid-configuration document is
+    served by any Terminus or DemandScience host.
+  source: https://support.demandscience.com/hc/en-us/articles/360059215833-Logging-Into-the-DemandScience-Platform-Using-SAML-2-0
+- id: oauth2
+  conforms: unknown
+  evidence: >-
+    OAuth 2.0 endpoints appear only as inputs the customer supplies for their own
+    IdP. No OAuth 2.0 authorization server is published for the API, and
+    /.well-known/oauth-authorization-server returns 401 on api.terminusplatform.com.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: '/.well-known/security.txt returns 404 on demandscience.com and terminus.bound360.com, 401 on api.terminusplatform.com.'
+- id: rfc8615-well-known
+  conforms: false
+  evidence: No .well-known document was recoverable on any host. See well-known/terminus-well-known.yml.
+- id: rfc9457-problem-details
+  conforms: unknown
+  evidence: 'API error bodies are not publicly observable; anonymous requests return a plain-text 401 body ("Authentication Invalid"), not application/problem+json.'
+- id: a2a-agent-card
+  conforms: false
+  evidence: '/.well-known/agent-card.json and /.well-known/agent.json miss on every host (401 / 404 / SPA HTML catch-all).'
+- id: openapi
+  conforms: false
+  evidence: >-
+    No OpenAPI or Swagger document at any probed location on api.terminusplatform.com,
+    email.terminusplatform.com, terminus.bound360.com, app.demandscienceplatform.com,
+    or developer.terminus.com. The Redocly portal that renders the reference is
+    entirely behind a login.
+- id: tls13
+  conforms: partial
+  evidence: 'demandscience.com and developer.terminus.com negotiate TLSv1.3; api.terminusplatform.com negotiates TLSv1.2. See security/terminus-domain-security.yml.'
+- id: hsts
+  conforms: false
+  evidence: No Strict-Transport-Security header observed on demandscience.com or developer.terminus.com.
+- id: dnssec
+  conforms: false
+  evidence: 'DNSSEC not enabled on demandscience.com or terminus.com; no CAA records on either domain.'
+- id: dmarc
+  conforms: true
+  evidence: 'SPF and DMARC present on both demandscience.com and terminus.com, DMARC policy p=reject.'
+x-evidence:
+- {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/360059215833.json', http_status: 200, fetched: '2026-08-05'}
+- {url: 'https://api.terminusplatform.com/.well-known/oauth-authorization-server', http_status: 401, fetched: '2026-08-05'}
+- {url: 'https://demandscience.com/.well-known/security.txt', http_status: 404, fetched: '2026-08-05'}

@@ -1,10 +1,19 @@
 aid: terminus
 name: Terminus
-description: 'Terminus is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Terminus is an account-based marketing (ABM) platform covering account-based
+  advertising, web personalization, email-signature marketing (Sigstr), conversational
+  chat (Ramble) and revenue measurement (BrightFunnel). Terminus merged into DemandScience
+  on 2024-11-12; terminus.com now 301-redirects to demandscience.com and the product
+  runs as the DemandScience ABM Platform at app.demandscienceplatform.com. Terminus-branded
+  infrastructure is still in production — api.terminusplatform.com, email.terminusplatform.com
+  (Email Experiences / Signature Ads), terminus.bound360.com (Web Experiences) and
+  *.terminus.services — and the API reference is published on a Redocly developer portal
+  at developer.terminus.com. Platform API access is issued through a support ticket,
+  and every path on the developer portal and the API host requires credentials.'
 url: https://raw.githubusercontent.com/api-evangelist/terminus/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
+x-source-url: https://forgeglobal.com/terminus_stock/
 x-tier: stub
 x-tier-reason: harvest
 specificationVersion: '0.20'
@@ -12,7 +21,42 @@ created: '2026-08-05'
 modified: '2026-08-05'
 tags:
 - Company
-apis: []
+- Account Based Marketing
+- Marketing
+- Advertising
+- Sales
+- B2B
+- Analytics
+- Email
+apis:
+- name: Terminus ABM Platform API
+  description: 'The account-based marketing platform API behind Terminus (now the DemandScience
+    ABM Platform). The API host api.terminusplatform.com is live and answers every
+    anonymous request with HTTP 401 "Authentication Invalid"; the reference is published
+    on a Redocly developer portal at developer.terminus.com where every path 302-redirects
+    to /redocly-login. Platform API access is requested through a support ticket.'
+  humanURL: https://developer.terminus.com/
+  baseURL: https://api.terminusplatform.com/
+  tags:
+  - Account Based Marketing
+  - Marketing
+  properties:
+  - type: DeveloperPortal
+    url: https://developer.terminus.com/
+  - type: Authentication
+    url: authentication/terminus-authentication.yml
+- name: Employee Automation API
+  description: 'A dedicated service that streamlines management of users and employee
+    signature data inside an Email Experiences (Signature Ads, formerly Sigstr) account.
+    Employee data delivered to the API endpoint creates, updates and removes employees
+    in real time; v4 (July 2022) stops Employee Group changes from overwriting admin
+    selections made in the UI. Access is granted by submitting a support ticket, and
+    no public reference or specification is published.'
+  humanURL: https://support.demandscience.com/hc/en-us/articles/360051822454-Employee-Automation-API-for-Email-Experiences
+  baseURL: https://email.terminusplatform.com/
+  tags:
+  - Email
+  - Marketing
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +64,58 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://forgeglobal.com/terminus_stock/
+  url: https://demandscience.com/
+- type: DeveloperPortal
+  url: https://developer.terminus.com/
+- type: Documentation
+  url: https://support.demandscience.com/hc/en-us
+- type: Support
+  url: https://support.demandscience.com/hc/en-us
+- type: Login
+  url: https://app.demandscienceplatform.com/
+- type: Blog
+  url: https://demandscience.com/resources/blog/
+- type: TermsOfService
+  url: https://demandscience.com/terms-of-service/
+- type: PrivacyPolicy
+  url: https://demandscience.com/privacy-policy/
+- type: GitHubOrganization
+  url: https://github.com/demandscience
+- type: Authentication
+  url: authentication/terminus-authentication.yml
+- type: Lifecycle
+  url: lifecycle/terminus-lifecycle.yml
+- type: Deprecation
+  url: https://support.demandscience.com/hc/en-us/articles/46047614705811-Chat-Experiences-Deprecation-December-31-2025
+- type: Conformance
+  url: conformance/terminus-conformance.yml
+- type: DomainSecurity
+  url: security/terminus-domain-security.yml
+- type: TrustCenter
+  url: security/terminus-trust-center.yml
+- type: LLMsTxt
+  url: llms/terminus-llms.txt
+x-enrichment:
+  date: '2026-08-05'
+  status: minimal
+  artifacts_added: 7
+  pass: local-v1
+x-coverage:
+  state: gated
+  reason: partner-login
+  detail: >-
+    Every path on the Terminus developer portal at developer.terminus.com — including
+    /openapi.yaml, /llms.txt and /.well-known/agent-card.json — 302-redirects to a
+    Redocly account login, and the live API host api.terminusplatform.com answers
+    every path with HTTP 401 "Authentication Invalid"; the help center states that
+    Platform API access is issued only by submitting a DemandScience support ticket.
+  evidence:
+  - url: https://developer.terminus.com/openapi.yaml
+    status: 302
+  - url: https://api.terminusplatform.com/openapi.json
+    status: 401
+  - url: https://developer.terminus.com/redocly-login
+    status: 200
+  - url: https://support.demandscience.com/api/v2/help_center/en-us/articles/360051822454.json
+    status: 200
+  checked: '2026-08-05'

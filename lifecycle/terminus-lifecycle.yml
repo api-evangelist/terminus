@@ -1,0 +1,66 @@
+generated: '2026-08-05'
+method: searched
+source: https://support.demandscience.com/hc/en-us
+versioning:
+  scheme: major-version-number
+  current: 'v4 (Employee Automation API, since July 2022)'
+  docs: https://support.demandscience.com/hc/en-us/articles/360051822454-Employee-Automation-API-for-Email-Experiences
+  note: >-
+    The only publicly stated API version anywhere on the Terminus / DemandScience
+    surface is the Employee Automation API v4. No versioning policy, no version
+    header, and no dated version train is published. The ABM Platform API reference
+    is behind the developer.terminus.com login, so its versioning scheme is not
+    publicly observable.
+deprecation:
+  policy_url: null
+  sunset_header: unknown
+  note: >-
+    No general deprecation policy is published, but DemandScience does publish dated
+    product retirement notices in the help center, with a stated removal date and
+    required customer actions.
+  announcements:
+  - product: Chat Experiences (formerly Ramble)
+    url: https://support.demandscience.com/hc/en-us/articles/46047614705811-Chat-Experiences-Deprecation-December-31-2025
+    announced: '2025-11-03'
+    retirement_date: '2025-12-31'
+    scope: 'Chat Experiences and all API endpoints will be removed'
+    data_deletion: '2026-01-14'
+    customer_action:
+    - Remove the Chat Experiences tag from your site
+    - Disconnect any linked APIs or integrations
+    - Request export of up to two years of chat transcripts before 2025-12-15
+    stated_impact_if_ignored: [errors in your logs, unexpected website output, permanent loss of prior chat history]
+    unaffected: 'No other DemandScience offering — including any part of the ABM Platform — is impacted'
+brand_lifecycle:
+  event: merger
+  date: '2024-11-12'
+  detail: >-
+    Terminus merged into DemandScience. terminus.com 301-redirects to
+    demandscience.com (every content path lands on a demandscience.com page with
+    ?utm_campaign=terminus-redirect), app.terminusplatform.com redirects to
+    app.demandscienceplatform.com, and support.terminus.com redirects to
+    support.demandscience.com. Terminus-branded infrastructure remains in production:
+    api.terminusplatform.com, email.terminusplatform.com (Email Experiences /
+    Signature Ads), terminus.bound360.com (Web Experiences), *.terminus.services.
+  product_renames:
+    Email Experiences: Signature Ads
+    Klarity: Audience Builder
+    Lastbounce: Verify
+sla:
+  url: null
+  uptime_target: null
+status_page:
+  url: https://status.terminus.com/
+  state: inactive
+  note: >-
+    status.terminus.com resolves to terminus.statuspage.io and redirects to
+    /inactive — the Statuspage account is no longer active. No replacement status
+    page was found at status.demandscience.com (DNS does not resolve). No
+    StatusPage pointer is wired in apis.yml because there is no working status page.
+deprecated_operations: []
+x-evidence:
+- {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/46047614705811.json', http_status: 200, fetched: '2026-08-05'}
+- {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/360051822454.json', http_status: 200, fetched: '2026-08-05'}
+- {url: 'https://status.terminus.com/', http_status: 200, final_url: 'https://terminus.statuspage.io/inactive', fetched: '2026-08-05'}
+- {url: 'https://status.demandscience.com/', http_status: 0, result: dns-no-resolve, fetched: '2026-08-05'}
+- {url: 'https://terminus.com/platform/', http_status: 200, final_url: 'https://demandscience.com/search?utm_campaign=terminus-redirect', fetched: '2026-08-05'}
