@@ -1,7 +1,12 @@
-generated: '2026-08-05'
+generated: '2026-08-12'
 method: probed
 source: live GET of /.well-known/* across every Terminus + DemandScience host
 summary: >-
+  UPDATED 2026-08-12: re-probed, plus the newly discovered Verify API host
+  api.lastbounce.com. Result is unchanged — NO .well-known document was recovered on
+  any host, so NO WellKnown or SecurityTxt pointer is wired in apis.yml. This file
+  records an absence, and an absence must never be scored as a presence.
+  ORIGINAL SUMMARY:
   No .well-known document was recovered on any host. api.terminusplatform.com answers
   every path — including every /.well-known/* path — with HTTP 401 "Authentication
   Invalid", so the discovery surface is behind the same gate as the API itself.
@@ -11,6 +16,22 @@ summary: >-
   mistake them for hits. No agent card, no OAuth/OIDC metadata, no security.txt,
   no api-catalog, no llms.txt.
 hosts:
+- host: https://api.lastbounce.com
+  note: >-
+    Verify API production host (AWS API Gateway, us-east-2). Every path — documented
+    or not — returns HTTP 403 with a JSON body from the gateway edge, so the
+    discovery surface is behind the same key gate as the API. Probed 2026-08-12.
+  documents:
+  - {path: /.well-known/security.txt, status: 403, body: '{"message":"Missing Authentication Token"}'}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+  - {path: /.well-known/api-catalog, status: 403}
+  - {path: /.well-known/agent-card.json, status: 403}
+  - {path: /.well-known/agent.json, status: 403}
+  - {path: /llms.txt, status: 403}
+  - {path: /openapi.json, status: 403}
+  - {path: /swagger.json, status: 403}
+  - {path: /v3/api-docs, status: 403}
 - host: https://api.terminusplatform.com
   note: live API host; blanket 401 on every path
   documents:

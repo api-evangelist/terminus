@@ -1,0 +1,79 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.demandscience.com/hc/en-us/articles/38485976880147-Error-Handling
+docs: https://support.demandscience.com/hc/en-us/sections/38485678357267-API-Documentation
+note: >-
+  SEARCHED from the provider's own "Error Handling" article, not derived from a
+  specification — Terminus / DemandScience publishes no OpenAPI anywhere anonymously
+  reachable, so there are no 4xx/5xx response objects to derive from. The envelope
+  below is transcribed from the sample error response the article publishes. It is
+  NOT RFC 9457 problem+json: the media type is application/json and the member names
+  are httpStatus / code / timeStamp / codeName / exceptionName / message, none of
+  which are RFC 9457 members (type / title / status / detail / instance). This
+  catalog covers the Verify API, the only API of this provider whose error contract
+  is publicly documented.
+api: Verify API
+format: vendor-json
+media_type: application/json
+rfc9457: false
+envelope:
+  fields:
+  - {name: httpStatus, type: string, description: 'The status description, e.g. BAD_REQUEST.'}
+  - {name: code, type: integer, description: 'The numeric HTTP status code, e.g. 400.'}
+  - {name: timeStamp, type: string, format: date-time, description: 'When the error occurred, ISO 8601 with offset (e.g. 2022-03-01T07:05:32.204+00:00).'}
+  - {name: codeName, type: string, description: 'Another representation of the HTTP status.'}
+  - {name: exceptionName, type: string, description: 'A more detailed label for the specific error type, e.g. InvalidParameterException.'}
+  - {name: message, type: string, description: 'A human-readable explanation of the error.'}
+  example_shape: '{"httpStatus":"BAD_REQUEST","code":400,"timeStamp":"...","codeName":"BAD_REQUEST","exceptionName":"InvalidParameterException","message":"jobId format1 is not valid"}'
+classes:
+- range: 4xx
+  name: Client Errors
+  description: 'The request was invalid or cannot be processed (e.g. missing parameters or incorrect formatting).'
+  remediation: 'Review your input parameters; for authentication errors verify your API key or credentials.'
+- range: 5xx
+  name: Server Errors
+  description: 'Something went wrong on the server side, even though the request may have been valid.'
+  remediation: 'Retry the request, or escalate through the DemandScience Help Center if the issue persists.'
+problem_types:
+- exceptionName: InvalidParameterException
+  http_status: 400
+  httpStatus: BAD_REQUEST
+  title: Invalid parameter
+  detail_example: 'jobId format1 is not valid'
+  remediation: Review the request parameters — most commonly a malformed batch jobId (the published job ids are UUIDs).
+  source: https://support.demandscience.com/hc/en-us/articles/38485976880147-Error-Handling
+- exceptionName: null
+  http_status: 403
+  httpStatus: FORBIDDEN
+  title: Missing or rejected API key
+  detail_example: '{"message":"Forbidden"} / {"message":"Missing Authentication Token"}'
+  remediation: 'Send the account key in the x-api-key request header. Observed live: an anonymous POST to /api/singleEmail/validate returns {"message":"Forbidden"}; an unmatched path returns {"message":"Missing Authentication Token"} with x-amzn-ErrorType MissingAuthenticationTokenException.'
+  method: probed
+  source: https://api.lastbounce.com/api/singleEmail/validate
+  note: >-
+    This is the AWS API Gateway edge response, not the vendor envelope above — the
+    gateway rejects the request before it reaches the Verify service, so the two
+    error shapes are different and a client must handle both.
+- exceptionName: null
+  http_status: null
+  httpStatus: null
+  title: Insufficient credits
+  detail_example: null
+  remediation: 'Purchase additional verification credits. Documented behaviour: "For every email verification, a credit is consumed from your account. If you lack sufficient credits, the API call will be unsuccessful." The status code and envelope for this case are not published.'
+  source: https://support.demandscience.com/hc/en-us/articles/47521026202771-Verify-API
+error_handling_guidance:
+  source: https://support.demandscience.com/hc/en-us/articles/38485976880147-Error-Handling
+  steps:
+  - Capture and check the API response, especially when the status code is in the 4xx or 5xx range.
+  - Log timeStamp, exceptionName and message for auditing and debugging.
+  - Act on the error type — review inputs for InvalidParameterException, verify the API key for authentication errors, retry or escalate on server errors.
+not_documented:
+- api: Terminus ABM Platform API
+  reason: 'Anonymous requests return a plain-text HTTP 401 body "Authentication Invalid"; the reference is behind the developer.terminus.com login.'
+- api: Employee Automation API
+  reason: 'No public reference is published; access is granted by support ticket.'
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/38485976880147.json', http_status: 200}
+  - {url: 'https://api.lastbounce.com/api/singleEmail/validate', http_status: 403, method: POST}

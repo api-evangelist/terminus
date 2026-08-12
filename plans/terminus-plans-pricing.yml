@@ -1,0 +1,53 @@
+generated: '2026-08-12'
+method: searched
+source: https://demandscience.com/faq/pricing-fit-commercial/
+note: >-
+  Terminus / DemandScience publishes NO plans, NO tiers and NO price points for any
+  product or API. plan_count is 0 and that zero is the measurement. Three separate
+  paths were checked. (1) https://demandscience.com/pricing/ does not serve a
+  pricing page at all — it 301-redirects to
+  https://demandscience.com/wp-content/uploads/2026/06/pricing.png, a 710-byte PNG
+  image, which is a broken canonical pricing URL rather than a paywall. (2) The only
+  surviving commercial page is an FAQ, "Working with DemandScience: Fit, Pricing,
+  and Getting Started", which explains the commercial MODEL in prose but names no
+  number, no unit rate and no tier. (3) The Verify API meters in prepaid credits,
+  but no credit price, no credit pack size and no self-serve checkout is published
+  anywhere on the site or in the help center. Access to every API is a sales or
+  support conversation.
+plan_count: 0
+plans: []
+pricing_model:
+  published: false
+  self_serve_checkout: false
+  free_tier: false
+  trial: false
+  billing_units:
+  - unit: credit
+    applies_to: Verify API / Intelligent Verification
+    rule: 'One credit is consumed per email verification; credits are valid for the lifetime of the account or until used up.'
+    price_per_unit: null
+    pack_sizes: []
+    source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+  - unit: managed-program
+    applies_to: DemandScience ABM programs (the former Terminus product line)
+    rule: 'Sold as a managed service rather than a platform subscription. The company states its model "doesn''t include platform subscription fees layered on top of media spend" — the "Platform Tax Manifesto" positioning — but publishes no rate card.'
+    price_per_unit: null
+    source: https://demandscience.com/faq/pricing-fit-commercial/
+  gate: sales
+  gate_detail: >-
+    "The fastest path is a pipeline audit — a focused conversation (typically 45
+    minutes) ... designed to give you a concrete answer to 'what would a
+    DemandScience program look like for us, and what would it cost?' before you
+    commit to anything." Pricing is quoted per engagement, after a call.
+api_pricing:
+  Terminus ABM Platform API: {published: false, note: 'Included with the platform contract; access issued by DemandScience support ticket. No API-specific price published.'}
+  Employee Automation API: {published: false, note: 'Access granted by support ticket. No API-specific price published.'}
+  Verify API: {published: false, note: 'Metered in account credits. No credit price published; the credit balance is visible only inside the Intelligent Verification dashboard.'}
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://demandscience.com/pricing/', http_status: 301, redirect: 'https://demandscience.com/wp-content/uploads/2026/06/pricing.png'}
+  - {url: 'https://demandscience.com/wp-content/uploads/2026/06/pricing.png', http_status: 200, content_type: image/png, bytes: 710}
+  - {url: 'https://demandscience.com/faq/pricing-fit-commercial/', http_status: 200, note: 'commercial FAQ; no price points'}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/46450196227731.json', http_status: 200, note: 'credits explained, no credit price'}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/articles/search.json?query=pricing', http_status: 200, note: '7 results, none a price list'}

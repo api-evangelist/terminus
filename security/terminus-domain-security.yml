@@ -1,4 +1,4 @@
-generated: '2026-08-05'
+generated: '2026-08-12'
 method: probed
 source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
 hosts:
@@ -17,6 +17,16 @@ hosts:
   tls_version: TLSv1.2
   cert_expires: Feb  9 23:59:59 2027 GMT
   hsts: null
+- host: api.lastbounce.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 15 23:59:59 2026 GMT
+  hsts: false
+  note: >-
+    Verify API production host. Added by hand on 2026-08-12: this host was found
+    during contract discovery and is not reached by probe-domain-security.py, which
+    walks only the first apis.yml hosts. Probed directly with openssl s_client and
+    curl.
 domains:
 - domain: demandscience.com
   dnssec: false
@@ -30,3 +40,16 @@ domains:
   spf: true
   dmarc: true
   dmarc_policy: reject
+- domain: lastbounce.com
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine
+  apex_a_record: false
+  note: >-
+    Verify API domain. The apex has NO A record — only NS (Route 53) and mail
+    records — so lastbounce.com itself does not serve a site; the product lives at
+    api/sqa-api/dev-api subdomains and is marketed under the DemandScience brand.
+    No DNSSEC, no CAA. DMARC policy is quarantine with sp=none, weaker than the
+    reject policy on demandscience.com and terminus.com. Probed by hand 2026-08-12.

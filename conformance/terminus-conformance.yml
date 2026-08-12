@@ -1,7 +1,13 @@
-generated: '2026-08-05'
+generated: '2026-08-12'
 method: searched
 source: https://support.demandscience.com/hc/en-us
 note: >-
+  UPDATED 2026-08-12: a third API — the Verify API at api.lastbounce.com — was found
+  fully documented in the DemandScience Help Center "API Documentation" section.
+  It still ships no machine-readable specification, but its error envelope IS now
+  publicly observable, so rfc9457-problem-details moves from unknown to a determined
+  `false`, and http-status-codes can be asserted true.
+  ORIGINAL NOTE:
   Terminus publishes no OpenAPI, AsyncAPI, GraphQL SDL or JSON Schema anywhere that
   is anonymously reachable, so nothing below is derived from a specification. Every
   entry is either a claim made in the public DemandScience Help Center or a fact
@@ -37,8 +43,38 @@ standards:
   conforms: false
   evidence: No .well-known document was recoverable on any host. See well-known/terminus-well-known.yml.
 - id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    Determined 2026-08-12 from the Verify API "Error Handling" article, which
+    publishes the error envelope verbatim. The media type is application/json (not
+    application/problem+json) and the members are httpStatus / code / timeStamp /
+    codeName / exceptionName / message — none of which is an RFC 9457 member
+    (type / title / status / detail / instance). A second, different error shape
+    ({"message":"Forbidden"}) is returned by the AWS API Gateway edge. The Terminus
+    ABM Platform API remains unobservable: anonymous requests return a plain-text
+    401 body ("Authentication Invalid").
+  source: https://support.demandscience.com/hc/en-us/articles/38485976880147-Error-Handling
+- id: http-status-codes
+  conforms: true
+  evidence: >-
+    "The Verify API uses standard HTTP status codes to indicate the result of each
+    request: 4xx - Client Errors ... 5xx - Server Errors", and the published sample
+    error carries both a symbolic httpStatus (BAD_REQUEST) and the numeric code 400.
+    Confirmed live: an anonymous POST returns 403.
+  source: https://support.demandscience.com/hc/en-us/articles/38485976880147-Error-Handling
+- id: rfc6750-bearer-token
+  conforms: false
+  evidence: 'No documented API uses a Bearer token. The only published header scheme is the custom `x-api-key` header on the Verify API.'
+- id: rfc8594-sunset-header
   conforms: unknown
-  evidence: 'API error bodies are not publicly observable; anonymous requests return a plain-text 401 body ("Authentication Invalid"), not application/problem+json.'
+  evidence: 'Product retirements are announced as dated help-center articles (see lifecycle/terminus-lifecycle.yml). No Sunset or Deprecation response header is documented, and none is observable without credentials.'
+- id: webhooks
+  conforms: false
+  evidence: 'No webhook or callback surface is documented for any product. A help-center search for "webhook" returns 0 articles; the Verify API''s asynchronous batch flow is completion-by-polling only.'
+  source: https://support.demandscience.com/api/v2/help_center/articles/search.json?query=webhook
+- id: asyncapi
+  conforms: false
+  evidence: 'No AsyncAPI document and no event/streaming surface is published on any host.'
 - id: a2a-agent-card
   conforms: false
   evidence: '/.well-known/agent-card.json and /.well-known/agent.json miss on every host (401 / 404 / SPA HTML catch-all).'
@@ -48,7 +84,14 @@ standards:
     No OpenAPI or Swagger document at any probed location on api.terminusplatform.com,
     email.terminusplatform.com, terminus.bound360.com, app.demandscienceplatform.com,
     or developer.terminus.com. The Redocly portal that renders the reference is
-    entirely behind a login.
+    entirely behind a login. Re-checked 2026-08-12 and extended to the newly found
+    Verify API host: api.lastbounce.com returns HTTP 403
+    {"message":"Missing Authentication Token"} on /openapi.json, /openapi.yaml,
+    /swagger.json, /v3/api-docs, /v2/api-docs, /api-docs, /swagger-ui.html, /docs and
+    /redoc. The Verify API reference is published as prose plus cURL in the
+    DemandScience Help Center, and the article states the full API documentation is
+    supplied on request — "If you'd like a copy of the full API documentation, feel
+    free to contact us through the DemandScience Help Center."
 - id: tls13
   conforms: partial
   evidence: 'demandscience.com and developer.terminus.com negotiate TLSv1.3; api.terminusplatform.com negotiates TLSv1.2. See security/terminus-domain-security.yml.'

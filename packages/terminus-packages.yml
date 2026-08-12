@@ -1,0 +1,159 @@
+generated: '2026-08-12'
+method: searched
+source: https://www.npmjs.com/org/terminus
+note: >-
+  Every package below was published from the Terminus first-party GitHub
+  organization github.com/GetTerminus ("Terminus Account Based Marketing") under the
+  npm @terminus scope, so official: true is accurate on the publisher axis. NONE OF
+  THEM IS AN API CLIENT. They are the Angular design system, design tokens and lint
+  configurations Terminus used to build its own front end — there is no first-party
+  SDK for the Terminus ABM Platform API, the Employee Automation API or the Verify
+  API in any registry (npm, PyPI, RubyGems, Maven Central, NuGet, crates.io,
+  pkg.go.dev, Packagist). For that reason NO `SDKs` pointer is wired in apis.yml;
+  wiring one would credit Terminus with a client library it never shipped.
+  CURRENCY: the newest release in the whole scope is 2021-01-20. The @terminus scope
+  has been dormant for five years, which straddles the 2024-11-12 DemandScience
+  merger — the packages predate the merger and were not carried forward under
+  DemandScience branding.
+summary:
+  registries_searched: [npm, pypi, rubygems, maven-central, nuget, crates.io, pkg.go.dev, packagist]
+  official_packages: 9
+  official_api_clients: 0
+  newest_release: '2021-01-20'
+  oldest_release: '2019-08-02'
+  scope_status: dormant
+packages:
+- name: '@terminus/ui'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/ui
+  official: true
+  api_client: false
+  kind: ui-library
+  language: typescript
+  license: MIT
+  version: 18.6.1
+  published: '2020-05-20'
+  repository: https://github.com/GetTerminus/terminus-ui
+  description: The Terminus UI Library — the Angular component library behind the Terminus ABM Platform front end.
+- name: '@terminus/ngx-tools'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/ngx-tools
+  official: true
+  api_client: false
+  kind: utilities
+  language: typescript
+  license: MIT
+  version: 8.0.6
+  published: '2020-05-12'
+  repository: https://github.com/GetTerminus/ngx-tools
+  description: A collection of tools and utilities for Terminus Angular applications.
+- name: '@terminus/design-tokens'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/design-tokens
+  official: true
+  api_client: false
+  kind: design-tokens
+  language: typescript
+  license: MIT
+  version: 3.2.1
+  published: '2020-12-16'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: The collection of Terminus design tokens.
+- name: '@terminus/fe-jwt'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/fe-jwt
+  official: true
+  api_client: false
+  kind: utilities
+  language: typescript
+  license: MIT
+  version: 3.0.0
+  published: '2020-12-16'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: A collection of helpers for dealing with JWT tokens.
+- name: '@terminus/fe-utilities'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/fe-utilities
+  official: true
+  api_client: false
+  kind: utilities
+  language: typescript
+  license: MIT
+  version: 2.0.0
+  published: '2020-12-16'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: A collection of tools and utilities for Terminus applications.
+- name: '@terminus/fe-testing'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/fe-testing
+  official: true
+  api_client: false
+  kind: testing
+  language: typescript
+  license: MIT
+  version: 2.0.0
+  published: '2020-12-16'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: A collection of helpers to facilitate testing UI components.
+- name: '@terminus/eslint-config-frontend'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/eslint-config-frontend
+  official: true
+  api_client: false
+  kind: lint-config
+  language: javascript
+  license: MIT
+  version: 5.0.1
+  published: '2021-01-19'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: Terminus shared ESLint configuration.
+- name: '@terminus/stylelint-config-frontend'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/stylelint-config-frontend
+  official: true
+  api_client: false
+  kind: lint-config
+  language: javascript
+  license: MIT
+  version: 1.3.2
+  published: '2021-01-20'
+  repository: https://github.com/GetTerminus/terminus-oss
+  description: Terminus shared Stylelint configuration.
+- name: '@terminus/tslint-config-frontend'
+  registry: npm
+  url: https://www.npmjs.com/package/@terminus/tslint-config-frontend
+  official: true
+  api_client: false
+  kind: lint-config
+  language: javascript
+  license: MIT
+  version: 1.0.7
+  published: '2019-08-02'
+  repository: https://github.com/GetTerminus/tslint-config-frontend
+  description: Terminus TSLint configurations. Superseded by the ESLint configuration above.
+absent:
+  api_clients:
+    searched:
+    - {registry: npm, queries: [sigstr, demandscience, bound360, 'terminus platform', 'terminus abm', 'scope:terminus'], result: 'no first-party API client'}
+    - {registry: pypi, package: terminus-abm, http_status: 404}
+    - {registry: rubygems, result: 'no first-party API client gem published under the Terminus or DemandScience name'}
+    note: >-
+      The three documented APIs (ABM Platform, Employee Automation, Verify) are all
+      consumed over raw HTTP. The Verify API reference publishes cURL only. A
+      third-party module exists (@friggframework/api-module-terminus, last published
+      2024-03-27) but it is built by the Frigg framework project, not by Terminus,
+      and is therefore not recorded as a package of this provider.
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://registry.npmjs.org/@terminus%2Fui', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Fngx-tools', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Fdesign-tokens', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Ffe-jwt', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Ffe-utilities', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Ffe-testing', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Feslint-config-frontend', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Fstylelint-config-frontend', http_status: 200}
+  - {url: 'https://registry.npmjs.org/@terminus%2Ftslint-config-frontend', http_status: 200}
+  - {url: 'https://pypi.org/pypi/terminus-abm/json', http_status: 404}
+  - {url: 'https://api.github.com/orgs/GetTerminus/repos?per_page=100', http_status: 200, note: '73 public repos'}

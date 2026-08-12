@@ -1,0 +1,142 @@
+generated: '2026-08-12'
+method: derived
+source: >-
+  https://support.demandscience.com/hc/en-us/sections/38485678357267-API-Documentation
+  — derived from the JSON request/response examples and the result-code tables the
+  provider publishes, NOT from an OpenAPI (none exists on any anonymously reachable
+  host).
+note: >-
+  The entity graph of the Verify API (formerly Lastbounce, sold as Intelligent
+  Verification). Every field name and every enum value below appears verbatim in a
+  DemandScience Help Center article; nothing is inferred beyond the obvious typing
+  of literal JSON values. The Terminus ABM Platform API and the Employee Automation
+  API are excluded — neither publishes a payload example, so there is nothing to
+  derive.
+api: Verify API
+entities:
+- name: SingleEmailValidation
+  description: The synchronous result of validating one email address.
+  operation: 'POST /api/singleEmail/validate?email={email}'
+  fields:
+  - {name: email, type: string, description: The original email address submitted.}
+  - {name: result, type: string, enum_ref: Result, description: High-level validation outcome.}
+  - {name: resultDetail, type: string, enum_ref: ResultDetail, description: Specific explanation of why the result was returned.}
+  - {name: corrected, type: boolean, description: Whether the email was auto-corrected.}
+  - {name: verifiedEmail, type: string, description: The validated (or corrected) email address.}
+  - {name: domain, type: string, description: The domain part of the email.}
+  - {name: localPart, type: string, description: The portion before the '@'.}
+- name: BatchUpload
+  description: The acknowledgement returned when a CSV of addresses is submitted for batch verification.
+  operation: 'POST /api/batch/validation (multipart form field `file`)'
+  fields:
+  - {name: fileName, type: string}
+  - {name: fileSize, type: integer, description: Bytes.}
+  - {name: fileContentType, type: string, example: text/csv}
+  - {name: fileId, type: integer, description: Numeric identifier of the stored file.}
+  - {name: meta, type: object, ref: BatchUploadMeta}
+- name: BatchUploadMeta
+  description: Pre-processing summary metrics computed at upload time.
+  fields:
+  - {name: batchJobId, type: string, format: uuid, description: 'The durable job identifier used to poll status and download results.'}
+  - {name: emailCount, type: integer}
+  - {name: duplicateCount, type: integer}
+  - {name: spamtrapCount, type: integer}
+  - {name: disposableCount, type: integer}
+  - {name: roleAccountCount, type: integer}
+  - {name: invalidFormatCount, type: integer}
+  - {name: typoCount, type: integer}
+- name: BatchJobStatus
+  description: The progress and outcome breakdown of a batch verification job.
+  operation: 'POST /api/batch/{jobId}/status'
+  fields:
+  - {name: jobId, type: string, format: uuid}
+  - {name: countDetail, type: object, ref: BatchCountDetail}
+  - {name: totalEmail, type: integer}
+  - {name: totalProcessedEmail, type: integer}
+  - {name: status, type: string, enum: [IN_PROGRESS, COMPLETED]}
+  - {name: createDate, type: string, format: date-time}
+  - {name: completeDate, type: string, format: date-time}
+  - {name: processedTime, type: integer, description: Seconds taken to complete.}
+  - {name: processed, type: integer, description: Percent complete.}
+- name: BatchCountDetail
+  description: Per-result-class tally for a completed or in-flight batch job.
+  fields:
+  - {name: validCount, type: integer}
+  - {name: invalidCount, type: integer}
+  - {name: acceptAllCount, type: integer}
+  - {name: riskyCount, type: integer}
+  - {name: duplicateCount, type: integer}
+  - {name: unknownCount, type: integer}
+- name: ResultsFile
+  description: The CSV of per-address results for a completed batch job.
+  operation: 'GET /api/file/download/{jobId}'
+  media_type: text/csv
+  columns:
+  - {name: Email, description: The original email submitted for verification.}
+  - {name: Verified Email, description: The verified or corrected version of the original email.}
+  - {name: Corrected, description: 'Flag indicating whether the email was corrected (TRUE/FALSE).'}
+  - {name: Result, description: 'The verification result — same vocabulary as SingleEmailValidation.result.'}
+  - {name: Additional Status Info, description: 'The result detail — same vocabulary as SingleEmailValidation.resultDetail.'}
+- name: ErrorResponse
+  description: The vendor error envelope.
+  ref: errors/terminus-problem-types.yml
+  fields: [httpStatus, code, timeStamp, codeName, exceptionName, message]
+relationships:
+- {from: BatchUpload, to: BatchUploadMeta, type: has_one, via: meta}
+- {from: BatchUpload, to: BatchJobStatus, type: has_one, via: 'meta.batchJobId -> jobId'}
+- {from: BatchJobStatus, to: BatchCountDetail, type: has_one, via: countDetail}
+- {from: BatchJobStatus, to: ResultsFile, type: has_one, via: 'jobId -> path parameter of /api/file/download/{jobId}'}
+- {from: ResultsFile, to: SingleEmailValidation, type: has_many, via: 'one CSV row per submitted address, carrying the same Result/Additional Status Info vocabulary'}
+identifiers:
+- {name: batchJobId, format: uuid, prefix: none, scope: 'batch verification job; the primary correlation id across submit, poll and download'}
+- {name: fileId, format: integer, prefix: none, scope: 'the stored upload; not used by any documented downstream call'}
+enums:
+  Result:
+    source: https://support.demandscience.com/hc/en-us/articles/38485945587091-Download-Results
+    values:
+    - {value: VALID, description: Email is valid.}
+    - {value: INVALID, description: Email is invalid.}
+    - {value: UNKNOWN, description: Unable to determine results.}
+    - {value: RISKY, description: Email is risky.}
+    - {value: DUPLICATE, description: Duplicate email detected.}
+    - {value: ACCEPT_ALL, description: Email is accept-all.}
+    - {value: ACCEPT_ALL/KNOWN_USER, description: Reliable determination the email address has an Office 365 account.}
+    - {value: ACCEPT_ALL/UNKNOWN_USER, description: Reliable determination the email address does not have an Office 365 account.}
+  ResultDetail:
+    source: https://support.demandscience.com/hc/en-us/articles/38485945587091-Download-Results
+    values:
+    - {value: OK, description: Email address is valid — deliverable email address.}
+    - {value: ANY_EMAIL_ACCEPTED, description: Email server is accepting any emails for the domain.}
+    - {value: B2C, description: 'Email address is B2C — from a free provider such as hotmail, yahoo, gmail.'}
+    - {value: BAD, description: Email address is bad.}
+    - {value: COMMON_TYPO, description: Email address contains a typo.}
+    - {value: DISPOSABLE, description: 'Email address is disposable — typically quick-turnaround addresses that are disposed of quickly.'}
+    - {value: DNS_FAILURE, description: DNS lookup of the email domain results in a failure.}
+    - {value: DOMAIN_SUSPENDED, description: Email domain is suspended.}
+    - {value: DUPLICATE, description: Email address is duplicate.}
+    - {value: EXCLUDE, description: Email address is excluded.}
+    - {value: GREYLISTING, description: Email address is greylisted.}
+    - {value: INVALID_CONVERSATION, description: Target mail server returned an invalid conversation.}
+    - {value: INVALID_FORMAT, description: Email address format is invalid.}
+    - {value: KNOWN_ACCEPT_ALL, description: Email address is a known accept-all.}
+    - {value: KNOWN_NOT_ACCEPT_ALL, description: Email address is a known not-accept-all.}
+    - {value: MAILBOX_FULL, description: 'Destination inbox was full and therefore rejecting messages.'}
+    - {value: ROLE_ACCOUNT, description: 'Email address is a role account, for example info@, webmaster@, postmaster@.'}
+    - {value: SERVER_CONFIG_ERROR, description: Target mail server has configuration issues.}
+    - {value: SPAM_TRAP, description: Email address is a known or suspected spam trap.}
+    - {value: TIMES_OUT, description: Email address processing timed out — may need reprocessing.}
+    - {value: UNABLE_TO_CONNECT, description: Unable to connect to the target mail server.}
+    - {value: UNKNOWN, description: Unable to distinguish specific results.}
+    - {value: MAILBOX_NOT_FOUND, description: 'Named in the single-email article as an example resultDetail; not repeated in the code table.'}
+    - {value: DOMAIN_INVALID, description: 'Named in the single-email article as an example resultDetail; not repeated in the code table.'}
+    note: >-
+      The provider publishes the code table across three separate tables in one
+      article; MAILBOX_NOT_FOUND and DOMAIN_INVALID appear only as inline examples in
+      the "Verify Single and Batch Uploads" article and are flagged as such rather
+      than dropped.
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/38485762247059.json', http_status: 200}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/38485850016787.json', http_status: 200}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/38485945587091.json', http_status: 200}

@@ -1,0 +1,125 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.demandscience.com/hc/en-us/sections/38485678357267-API-Documentation
+note: >-
+  Cross-cutting runtime semantics for the one API of this provider whose contract is
+  publicly documented — the Verify API (formerly Lastbounce, now sold as Intelligent
+  Verification). Everything here is transcribed from the six articles in the
+  DemandScience Help Center "API Documentation" section plus live probes of
+  api.lastbounce.com. There is no OpenAPI to derive from. Where a convention is
+  simply not published, it is recorded as `documented: false` rather than guessed —
+  in particular there is NO idempotency mechanism documented for any Terminus /
+  DemandScience API, so no Idempotency pointer is wired in apis.yml.
+api: Verify API
+base_url: https://api.lastbounce.com/
+authentication:
+  style: api-key-header
+  header: x-api-key
+  value: account API key
+  documented: true
+  oauth2: false
+  bearer: false
+  source: https://support.demandscience.com/hc/en-us/articles/38485762247059-Verify-Single-and-Batch-Uploads
+  note: >-
+    The gateway rejects a request with no key before the service sees it — an
+    anonymous POST returns HTTP 403 {"message":"Forbidden"}.
+idempotency:
+  documented: false
+  header: null
+  scope: null
+  retention: null
+  note: >-
+    No idempotency key, no replay window and no safe-retry contract is published for
+    any Terminus / DemandScience API. The batch endpoints are not idempotent in
+    practice: each upload creates a new fileId and a new batchJobId, and each email
+    verification consumes an account credit, so a blind retry of
+    /api/batch/validation both duplicates the job and burns credits.
+pagination:
+  documented: false
+  style: none
+  note: >-
+    No paginated collection endpoint is published. Batch results are not paged —
+    they are retrieved as a whole CSV file from /api/file/download/{jobId}.
+async_pattern:
+  style: submit-poll-download
+  documented: true
+  steps:
+  - 'Submit: POST /api/batch/validation with the CSV as multipart form field `file`; the response carries meta.batchJobId.'
+  - 'Poll: POST /api/batch/{jobId}/status until status is COMPLETED (IN_PROGRESS means keep polling).'
+  - 'Download: GET /api/file/download/{jobId} returns the results CSV.'
+  polling_guidance:
+    small_files: 'Poll every 5-10 seconds for files under 1,000 records.'
+    large_files: 'Poll less frequently for larger files to reduce unnecessary requests.'
+    source: https://support.demandscience.com/hc/en-us/articles/38485850016787-Checking-the-Batch-Job-Status
+  progress_signalling: 'The status response carries `processed` (percent complete), `totalProcessedEmail`, `totalEmail` and `processedTime` (seconds), so a client can render progress without extra calls.'
+  callbacks: false
+  webhooks: false
+  webhook_note: >-
+    No webhook or callback surface is documented. A search of the DemandScience Help
+    Center for "webhook" returns 0 articles, so completion must be discovered by
+    polling.
+large_payloads:
+  threshold_bytes: 10485760
+  rule: >-
+    Files larger than 10MB must be uploaded with the `generateUploadUrl` method
+    (presigned-upload style); files 10MB or smaller use the standard multipart
+    upload to /api/batch/validation.
+  recommended_max: '1,000,000 records (approximately a 20MB file)'
+  hard_limit: 'None stated — "We have no file size limit for our batch upload methods."'
+  source: https://support.demandscience.com/hc/en-us/articles/47521026202771-Verify-API
+  note: >-
+    The `generateUploadUrl` path itself is not published in the help center; the
+    article says the detail is in the full API documentation, which is supplied on
+    request.
+request_id_tracing:
+  documented: false
+  provider_header: null
+  observed: 'The AWS API Gateway edge returns x-amzn-RequestId and x-amz-apigw-id on error responses, but neither is documented as a support-correlation identifier.'
+  correlation_id: 'batchJobId (UUID) is the durable identifier for a batch job across submit, status and download.'
+versioning:
+  scheme: none-in-path
+  documented: false
+  note: >-
+    The Verify API paths carry no version segment (/api/singleEmail/validate,
+    /api/batch/validation). The only versioned API on this provider's surface is the
+    Employee Automation API, at v4 since July 2022. See lifecycle/terminus-lifecycle.yml.
+error_envelope:
+  format: vendor-json
+  rfc9457: false
+  fields: [httpStatus, code, timeStamp, codeName, exceptionName, message]
+  catalog: errors/terminus-problem-types.yml
+  note: 'Two distinct error shapes exist — the vendor envelope from the service, and the AWS API Gateway {"message":"..."} shape from the edge.'
+rate_limit_signalling:
+  headers: []
+  documented: false
+  note: >-
+    No X-RateLimit-*, RateLimit-* or Retry-After header is documented, and none was
+    observable anonymously. Consumption is metered in credits, not requests. See
+    rate-limits/terminus-rate-limits.yml.
+metering:
+  unit: credit
+  rule: 'One credit is consumed per email verification. If the account lacks sufficient credits, the API call is unsuccessful.'
+  balance_visibility: 'Remaining credits are shown in the top-right of the Intelligent Verification dashboard; no balance endpoint is documented.'
+  credit_expiry: 'Credits are valid for the lifetime of the account, or until used.'
+  source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+data_retention:
+  uploaded_files_days: 90
+  results: 'Checked email addresses are stored temporarily; the period varies by provider, B2B vs B2C, and whether the domain is accept-all.'
+  source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+content_types:
+  request: [application/x-www-form-urlencoded (query string), multipart/form-data]
+  response: [application/json, text/csv]
+  note: 'Single-email validation passes the address as the `email` query parameter on a POST, not as a JSON body — an unusual convention worth flagging to any client generator.'
+environments: sandbox/terminus-sandbox.yml
+cross_links:
+  errors: errors/terminus-problem-types.yml
+  lifecycle: lifecycle/terminus-lifecycle.yml
+  authentication: authentication/terminus-authentication.yml
+  rate_limits: rate-limits/terminus-rate-limits.yml
+  data_model: data-model/terminus-data-model.yml
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/sections/38485678357267/articles.json', http_status: 200, note: '6 articles in the API Documentation section'}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/articles/search.json?query=webhook', http_status: 200, note: 'count: 0'}
+  - {url: 'https://api.lastbounce.com/api/singleEmail/validate', http_status: 403, method: POST}

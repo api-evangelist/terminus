@@ -1,20 +1,47 @@
-generated: '2026-08-05'
+generated: '2026-08-12'
 method: searched
 source: https://support.demandscience.com/hc/en-us
-docs: https://support.demandscience.com/hc/en-us/articles/360045192013-Connecting-Your-Web-Experiences-API-Key
+docs: https://support.demandscience.com/hc/en-us/sections/38485678357267-API-Documentation
 note: >-
   Derived from the public DemandScience Help Center, not from an OpenAPI — Terminus
   publishes no machine-readable specification. The API reference lives on a Redocly
   developer portal at developer.terminus.com where every path 302s to /redocly-login,
   so the security schemes below are what the public help center documents plus what
   the live API host returns to an anonymous caller.
+  UPDATED 2026-08-12: the help center's "API Documentation" section publishes the
+  full auth contract for a third API — the Verify API — including the exact header
+  name. That is the only Terminus / DemandScience API whose header name is public.
 summary:
   types: [apiKey]
   api_key_in: [header]
   oauth2_flows: []
   issuance: support-ticket
   sso: [saml2, oidc, microsoft, google]
+  named_headers: [x-api-key]
 schemes:
+- name: VerifyApiKey
+  type: apiKey
+  in: header
+  parameter_name: x-api-key
+  api: Verify API
+  description: >-
+    The Verify API (formerly Lastbounce, sold as Intelligent Verification)
+    authenticates with an account API key sent in the `x-api-key` request header, on
+    every documented call — POST /api/singleEmail/validate,
+    POST /api/batch/validation, POST /api/batch/{jobId}/status and
+    GET /api/file/download/{jobId}. The key both authenticates the request and binds
+    it to the account's credit balance: "For every email verification, a credit is
+    consumed from your account. If you lack sufficient credits, the API call will be
+    unsuccessful." The same key is used across all three published environments
+    (dev-api / sqa-api / api .lastbounce.com) — there is no test-vs-live key prefix.
+    Anonymous calls are rejected at the AWS API Gateway edge with HTTP 403
+    {"message":"Forbidden"}.
+  key_prefix: null
+  rotation: not documented
+  scopes: none
+  sources:
+  - https://support.demandscience.com/hc/en-us/articles/47521026202771-Verify-API
+  - https://support.demandscience.com/hc/en-us/articles/38485762247059-Verify-Single-and-Batch-Uploads
 - name: PlatformApiKey
   type: apiKey
   in: header
@@ -46,6 +73,9 @@ user_authentication:
     oidc: [issuer, authorization-endpoint, token-endpoint, jwks-uri, userinfo-endpoint]
   docs: https://support.demandscience.com/hc/en-us/articles/360059215833-Logging-Into-the-DemandScience-Platform-Using-SAML-2-0
 x-evidence:
+- {url: 'https://api.lastbounce.com/api/singleEmail/validate', http_status: 403, method: POST, body: '{"message":"Forbidden"}', fetched: '2026-08-12'}
+- {url: 'https://api.lastbounce.com/', http_status: 403, body: '{"message":"Missing Authentication Token"}', note: 'AWS API Gateway us-east-2 edge rejection', fetched: '2026-08-12'}
+- {url: 'https://support.demandscience.com/api/v2/help_center/en-us/sections/38485678357267/articles.json', http_status: 200, note: 'API Documentation section, 6 articles', fetched: '2026-08-12'}
 - {url: 'https://api.terminusplatform.com/openapi.json', http_status: 401, body: Authentication Invalid, fetched: '2026-08-05'}
 - {url: 'https://api.terminusplatform.com/v1', http_status: 401, body: Authentication Invalid, fetched: '2026-08-05'}
 - {url: 'https://developer.terminus.com/', http_status: 302, redirect: /redocly-login, fetched: '2026-08-05'}

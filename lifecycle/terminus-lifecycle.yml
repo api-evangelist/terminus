@@ -1,4 +1,4 @@
-generated: '2026-08-05'
+generated: '2026-08-12'
 method: searched
 source: https://support.demandscience.com/hc/en-us
 versioning:
@@ -11,6 +11,15 @@ versioning:
     header, and no dated version train is published. The ABM Platform API reference
     is behind the developer.terminus.com login, so its versioning scheme is not
     publicly observable.
+    UPDATED 2026-08-12: the Verify API (api.lastbounce.com), documented publicly in
+    the help center, carries NO version segment in any of its paths
+    (/api/singleEmail/validate, /api/batch/validation, /api/batch/{jobId}/status,
+    /api/file/download/{jobId}) and no version header is documented — so it has no
+    versioning scheme at all, which is a distinct finding from "undisclosed".
+  per_api:
+    Employee Automation API: {scheme: major-version-number, current: v4, since: '2022-07'}
+    Verify API: {scheme: none, current: null, note: 'unversioned paths; no version header documented'}
+    Terminus ABM Platform API: {scheme: unknown, current: null, note: 'reference behind the Redocly login'}
 deprecation:
   policy_url: null
   sunset_header: unknown
@@ -57,6 +66,24 @@ status_page:
     /inactive — the Statuspage account is no longer active. No replacement status
     page was found at status.demandscience.com (DNS does not resolve). No
     StatusPage pointer is wired in apis.yml because there is no working status page.
+data_retention:
+  verify_uploaded_files_days: 90
+  verify_results: >-
+    "All email addresses are stored in our system for a certain period of time so
+    that the results can be retrieved by our customers. The length of time depends on
+    the provider, whether the email address is B2C or B2B, and if the domain is
+    configured to be accept-all."
+  credits: 'Credits are valid for the lifetime of the account, or until used up.'
+  source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+open_source_lifecycle:
+  org: https://github.com/GetTerminus
+  state: dormant
+  detail: >-
+    The first-party Terminus GitHub organization (73 public repos, "Terminus Account
+    Based Marketing") still exists, but its published npm scope @terminus has not
+    shipped a release since 2021-01-20 — four years before the DemandScience merger
+    closed and five years before this probe. Nothing was carried forward under
+    DemandScience branding. See packages/terminus-packages.yml.
 deprecated_operations: []
 x-evidence:
 - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/46047614705811.json', http_status: 200, fetched: '2026-08-05'}

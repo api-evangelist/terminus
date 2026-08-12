@@ -1,0 +1,64 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.demandscience.com/hc/en-us/articles/47521026202771-Verify-API
+note: >-
+  The only non-production environment DemandScience publishes anywhere on the
+  Terminus / DemandScience surface belongs to the Verify API (formerly Lastbounce).
+  The Verify API reference names three environments by hostname prefix and states
+  which one is the default. No test credentials, no test key prefix, no fixture
+  data, no time simulation and no trigger tooling are published, and the
+  non-production hosts require the same account API key as production — so this is a
+  named environment ladder, not a self-serve sandbox. NOTHING BELOW IS INVENTED:
+  every host and label is copied from the provider's own article. The Terminus ABM
+  Platform API (api.terminusplatform.com) and the Employee Automation API
+  (email.terminusplatform.com) publish no sandbox at all.
+api: Verify API
+sandbox_type: named-environments
+self_serve: false
+credentials:
+  scheme: shared
+  note: >-
+    The same account API key is presented as `x-api-key` in every environment. The
+    docs do not publish a test-vs-live key prefix, and every verification consumes a
+    credit from the account balance, so there is no free/simulated call path.
+  issuance: Verify account API key, obtained from DemandScience
+environments:
+- name: Production
+  host_prefix: api
+  base_url: https://api.lastbounce.com/
+  default: true
+- name: SQA
+  host_prefix: sqa-api
+  base_url: https://sqa-api.lastbounce.com/
+  default: false
+- name: Development
+  host_prefix: dev-api
+  base_url: https://dev-api.lastbounce.com/
+  default: false
+url_template: https://<environment>.lastbounce.com/
+test_data:
+  test_cards: []
+  test_accounts: []
+  fixtures: []
+  note: >-
+    No published test fixtures. The docs do publish a sample CSV structure for batch
+    uploads (a column whose header contains the word "Email", or bare addresses one
+    per line with no header) which is the closest thing to a fixture the provider
+    ships.
+  sample_file_docs: https://support.demandscience.com/hc/en-us/articles/38486002839699-Sample-CSV-File
+time_simulation:
+  supported: false
+  note: No test clocks or time-travel tooling are documented.
+triggers:
+  supported: false
+  note: No fixture/trigger tooling is documented.
+not_available_for:
+- api: Terminus ABM Platform API
+  reason: 'No environments published; the reference is behind the developer.terminus.com login and the host returns HTTP 401 on every anonymous path.'
+- api: Employee Automation API
+  reason: 'No environments published; access is granted only by DemandScience support ticket.'
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/47521026202771.json', http_status: 200, note: 'Verify API article, updated 2026-01-21'}
+  - {url: 'https://api.lastbounce.com/api/singleEmail/validate', http_status: 403, body: '{"message":"Missing Authentication Token"}', note: 'production host live; AWS API Gateway us-east-2'}

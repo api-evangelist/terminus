@@ -1,0 +1,95 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.demandscience.com/hc/en-us/sections/38485678357267-API-Documentation
+note: >-
+  DemandScience publishes NO request-rate limit for any Terminus / DemandScience
+  API — no requests-per-second, no burst, no quota window, and no rate-limit
+  response headers. limit_count is therefore 0 and that zero is the finding, not a
+  gap in this pass. What the provider does publish is a set of VOLUME and USAGE
+  constraints (credits, file sizes, export caps) plus polling guidance, all recorded
+  below as `constraints` so they are not mistaken for rate limits. Headers were also
+  checked live: an anonymous request to api.lastbounce.com returns no
+  X-RateLimit-*, RateLimit-* or Retry-After header.
+limit_count: 0
+limits: []
+headers:
+  documented: []
+  observed: []
+  retry_after: false
+  note: >-
+    No rate-limit signalling of any kind. The only response headers observed on
+    api.lastbounce.com are AWS API Gateway defaults (x-amzn-RequestId,
+    x-amz-apigw-id, x-amzn-ErrorType). An agent cannot back off on a runtime signal
+    from this API; it must rely on the polling cadence in the docs.
+exhaustion:
+  status_code: null
+  note: >-
+    The documented failure mode is credit exhaustion, not rate limiting: "For every
+    email verification, a credit is consumed from your account. If you lack
+    sufficient credits, the API call will be unsuccessful." The status code and
+    response body for that case are not published.
+constraints:
+- id: credits
+  api: Verify API
+  scope: per-account
+  kind: quota
+  unit: credit
+  rule: One credit is consumed per email verification.
+  window: none
+  expiry: 'Credits are valid for the lifetime of the account, or until used up.'
+  balance_visibility: 'Shown in the top-right of the Intelligent Verification dashboard; no balance endpoint is documented.'
+  source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+- id: batch-upload-standard-max
+  api: Verify API
+  scope: per-request
+  kind: payload-size
+  limit: 10485760
+  unit: bytes
+  rule: 'Files 10MB or smaller use the standard multipart upload to /api/batch/validation; files larger than 10MB must use the generateUploadUrl method.'
+  source: https://support.demandscience.com/hc/en-us/articles/38485762247059-Verify-Single-and-Batch-Uploads
+- id: batch-recommended-max
+  api: Verify API
+  scope: per-request
+  kind: recommendation
+  limit: 1000000
+  unit: records
+  rule: 'No hard file size limit — "We have no file size limit for our batch upload methods" — but the provider recommends a maximum of 1m records, approximately a 20MB file, for optimal performance.'
+  source: https://support.demandscience.com/hc/en-us/articles/46450196227731-Service-Usage-Credits
+- id: batch-status-polling
+  api: Verify API
+  scope: per-job
+  kind: polling-guidance
+  rule: 'Poll POST /api/batch/{jobId}/status every 5-10 seconds for small files (under 1,000 records); poll less frequently for larger files to reduce unnecessary requests.'
+  enforced: false
+  note: 'Stated as guidance "to avoid overloading your system or the API" — no server-side enforcement is described.'
+  source: https://support.demandscience.com/hc/en-us/articles/38485850016787-Checking-the-Batch-Job-Status
+- id: audience-builder-company-export
+  api: null
+  product: Audience Builder
+  scope: per-export
+  kind: export-cap
+  limit: 100000
+  unit: companies
+  rule: 'A maximum of 100,000 companies can be exported at once; larger exports raise a warning and must be split into batches.'
+  source: https://support.demandscience.com/hc/en-us/articles/38445503852691-Export-Limits
+- id: audience-builder-contact-export
+  api: null
+  product: Audience Builder
+  scope: per-export
+  kind: export-cap
+  limit: 100000
+  unit: contacts
+  rule: 'A maximum of 100,000 contacts can be exported at once; larger exports raise a warning and must be split into batches.'
+  source: https://support.demandscience.com/hc/en-us/articles/38445503852691-Export-Limits
+  note: 'This is a UI export cap in Audience Builder (formerly Klarity), not an API limit — recorded here because it is the only published throughput ceiling on the data side.'
+undocumented_for:
+- api: Terminus ABM Platform API
+  reason: 'Reference is behind the developer.terminus.com login; the host returns HTTP 401 on every anonymous path so no headers are observable.'
+- api: Employee Automation API
+  reason: 'No public reference published; access by support ticket only.'
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - {url: 'https://api.lastbounce.com/api/singleEmail/validate', http_status: 403, note: 'response headers carried no rate-limit header of any family'}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/46450196227731.json', http_status: 200}
+  - {url: 'https://support.demandscience.com/api/v2/help_center/en-us/articles/38445503852691.json', http_status: 200}
